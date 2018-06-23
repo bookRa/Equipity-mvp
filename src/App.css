@@ -68,3 +68,10 @@
   height: 25px;
   font-size: x-large;
 }
+
+#total{
+  font-style: italic;
+  font-weight: bold;
+  background-color: lightgreen;
+  float: right;
+}

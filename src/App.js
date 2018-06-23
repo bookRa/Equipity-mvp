@@ -116,6 +116,16 @@ class WishList extends Component {
                 )
               })
           }
+          <li id="total">Total Value: ${
+            this.props.items.reduce((acc, curr)=>{
+              console.log(acc, curr);
+              return acc+ (Number(curr.price)*Number(curr.quant))
+            },0)
+            }</li>
+            {/* let q= this.props.items.reduce((accumulated, next)=>{
+                  return (accumulated + next.quant*next.price)
+          }, 0); */}
+            
         </ul>
       </div>
     )
@@ -149,7 +159,7 @@ class SearchComp extends Component {
   render() {
     return (
       <div className="searchCompContainer">
-        <h1>Search Component Here!</h1>
+        <h1>Search Here!</h1>
         <SearchForm changeQuery={this.handleSearch} />
         <ul className="searchList">
           {
