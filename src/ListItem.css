@@ -1,0 +1,27 @@
+.listItem{
+    border: 2px solid black;
+    padding: 5px;
+    background-color: lightsalmon;
+}
+
+.itemName{
+    float:left;
+}
+
+.itemPrice{
+    float:right;
+}
+
+.itemPic{
+    width: 100px;
+    float: left;
+    margin-right: 5px;
+}
+
+button{
+    position: relative;
+    bottom: 42px;
+    background-color: green;
+    color: whitesmoke;
+    float: right;
+}
