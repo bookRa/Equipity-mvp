@@ -2,8 +2,13 @@
     border: 2px solid black;
     padding: 5px;
     background-color: lightsalmon;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-around;
+    height: 100px;
 }
 
+/* 
 .itemName{
     float:left;
 }
@@ -11,17 +16,24 @@
 .itemPrice{
     float:right;
 }
+ */
+ .itemPic{
+    /* width: 100px; */
+    /* float: left; */
+    /* margin-right: 5px; */
+    height: 100px;
 
-.itemPic{
-    width: 100px;
-    float: left;
-    margin-right: 5px;
 }
 
 button{
-    position: relative;
-    bottom: 42px;
+    /* position: relative; */
+    /* bottom: 42px; */
     background-color: green;
     color: whitesmoke;
-    float: right;
+    /* float: right; */
+}
+
+.deleteButton{
+    background-color: red;
+    color: black;
 }

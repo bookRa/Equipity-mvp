@@ -24,65 +24,172 @@ class App extends Component {
   }
 }
 
-class Equipity extends Component{
-  render(){
-    return(
-      <div className="container">
-        <WishList  />
-        <SearchComp  />
-      </div>
-    )
-  }
-}
-
-class WishList extends Component{
-  render(){
-    return(
-      <div className="wishListContainer">
-       <h1>Wishlist Here!</h1>
-      </div>
-    )
-  }
-}
-
-class SearchComp extends Component{
-  constructor(props){
+class Equipity extends Component {
+  constructor(props) {
     super(props);
-    this.state={
+    this.handleDelClick = this.handleDelClick.bind(this);
+    this.handleAddClick = this.handleAddClick.bind(this);
+    this.state = {
+      wishListItems: [
+        // {
+        //   name: "testItem",
+        //   price: 50.00,
+        //   imgUrl: "imgs/couch.jpg",
+        //   siteUrl: "http://www.testItem.com",
+        //   quant: 2,
+        // },
+        // {
+        //   name: "testItem2",
+        //   price: 50.00,
+        //   imgUrl: "imgs/lamp.jpg",
+        //   siteUrl: "http://www.testItem.com",
+        //   quant: 3
+        // }
+      ],
+      somethingElse: true,
+    }
+  }
+
+  handleDelClick(item) {
+    // console.log(item);
+    let newWL = this.state.wishListItems.filter((currI) => { return currI !== item });
+    // console.log(newWL);
+    this.setState({
+      wishListItems: newWL
+    })
+    // console.log(this);
+  }
+
+  handleAddClick(item, quant) {
+    let sameIndex = this.state.wishListItems.findIndex((wLItem) => {
+      return item.name === wLItem.name
+    })
+    if (sameIndex > -1) {
+      let newWL = this.state.wishListItems;
+      newWL[sameIndex].quant = Number(newWL[sameIndex].quant) + Number(quant);
+      this.setState({
+        wishListItems: newWL
+      })
+
+    } else {
+      let updateItem = item;
+      updateItem.quant = quant;
+      let newWL = this.state.wishListItems.concat(updateItem);
+      this.setState({
+        wishListItems: newWL
+      })
+    }
+  }
+  render() {
+    return (
+      <div className="container">
+        <WishList items={this.state.wishListItems} delFunc={this.handleDelClick} />
+        <SearchComp addFunc={this.handleAddClick} />
+
+      </div>
+    )
+  }
+}
+
+class WishList extends Component {
+
+  render() {
+    return (
+      <div className="wishListContainer">
+        <h1>Wishlist Here!</h1>
+        <ul className="wishList">
+          {
+            this.props.items.length === 0 ? <li id="noWishes"> Your wishlist is empty =( </li>
+              :
+              this.props.items.map((item, index) => {
+                // console.log(item)
+                return (
+                  <div key={`wishList${index}`}>
+                    <ListItem info={item} button={
+                      <button className="deleteButton"
+                        onClick={() => {
+                          this.props.delFunc(item)
+                        }}
+                      >Delete!</button>}
+                      quantSelector={"Qty: " + item.quant} />
+                  </div>
+                )
+              })
+          }
+        </ul>
+      </div>
+    )
+  }
+}
+
+class SearchComp extends Component {
+  constructor(props) {
+    super(props);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.state = {
       searchedItems: itemsArray
     }
   }
 
-  render(){
-    return(
+  handleSearch(str) {
+    let newArr;
+    if (!str) {
+      newArr = itemsArray;
+    } else {
+      newArr = itemsArray.filter((item) => {
+        return item.name.includes(str);
+      })
+    }
+    this.setState({
+      searchedItems: newArr
+    }
+    )
+  }
+
+  render() {
+    return (
       <div className="searchCompContainer">
-       <h1>Search Component Here!</h1>
-       {/* <SearchForm /> TODO IMPLEMENT */}
-       <ul className="searchList">
-         {
-           this.state.searchedItems.map((item)=>{
-             console.log(item)
-             return (
-             <div>
-               <ListItem info={item} button={
-               <button>Add this!</button>}/>
-              </div>
-             )
-           })
-         }
-       </ul>
+        <h1>Search Component Here!</h1>
+        <SearchForm changeQuery={this.handleSearch} />
+        <ul className="searchList">
+          {
+            this.state.searchedItems.map((item, index) => {
+              return (
+                <div key={`searchList${index}`}>
+                  <ListItem info={item} button={
+                    <button className="addButton"
+                      onClick={() => {
+                        let itemQuant = document.getElementById(`itemQuant_${item.name}`).value
+                        this.props.addFunc(item, itemQuant);
+                      }}
+                    >Add this!</button>}
+                    quantSelector={
+                      <span id='quantContainer'>
+                        <label htmlFor="itemQuant">How many?</label>
+                        <input type="number" id={`itemQuant_${item.name}`} defaultValue='1' name="itemQuant"
+                          min="1" max="100" />
+                      </span>
+                    } />
+
+                </div>
+              )
+            })
+          }
+        </ul>
       </div>
     )
   }
 }
 
-class ListItem extends Component{
-  
-  render(){
-    return(
+
+class ListItem extends Component {
+  //the click method returns the item object
+  render() {
+    return (
       <li className="listItem" key={this.props.name}>
-        <img className="itemPic" src={this.props.info.imgUrl} />
+        <img className="itemPic" alt={this.props.info.name + "img"} src={this.props.info.imgUrl} />
         <h5 className="itemName"> {this.props.info.name}</h5>
+        <span>{this.props.quantSelector}</span>
         <h5 className="itemprice">$ {this.props.info.price}</h5>
         {this.props.button}
       </li>
@@ -90,92 +197,15 @@ class ListItem extends Component{
   }
 }
 
+class SearchForm extends Component {
+  render() {
+    return (
+      <input id="searchBar" onChange={(e) => {
+        this.props.changeQuery(e.target.value)
+      }}
+        type="text" placeholder="Search Items" />
+    )
+  }
+}
+
 export default App;
-
-
-
-
-
-
-
-// class Equipity extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       itemList: [{ name: 'testName', location: 'www.example.com', price: '$10.00' }]
-//     }
-//   }
-
-//   handleSubmit(i) { //handles the submition of search form.
-//     let composedItem = { name: i, location: 'www.example.com', price: '$10.00' }
-//     this.setState({
-//       itemList: this.state.itemList.concat(composedItem)
-//     })
-
-//   }
-
-
-//   render() {
-//     return (
-//       <div className="container">
-//         <h2>Enter your Item</h2>
-//         <SearchForm onSubmit={(item) => this.handleSubmit(item)} />
-//         <ItemList items={this.state.itemList} />
-//       </div>
-//     )
-//   }
-// }
-
-// class SearchForm extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       searchValue: ''
-//     };
-//     this.handleChange = this.handleChange.bind(this);
-//     // this.searchSubmit= this.searchSubmit.bind(this);
-//   }
-//   handleChange(event) {
-//     this.setState({ searchValue: event.target.value });
-//   }
-
-//   // searchSubmit(event){
-
-//   //   // this.props.handleSubmit(this.state.searchValue)
-//   //   alert(this.state.searchValue + " was pressed");
-//   // }
-
-//   render() {
-//     return (
-//       <form onSubmit={(event) => {
-//         // this.searchSubmit();
-//         event.preventDefault();
-//         this.props.onSubmit(this.state.searchValue);
-//         this.setState({ searchValue: '' })
-//       }
-//       }>
-//         <input
-//           value={this.state.searchValue}
-//           onChange={this.handleChange}
-//           className="Search" type="text" placeholder="Hello World" />
-//         <button type="submit" value="Enter Item">Enter Item</button>
-//       </form>
-//     )
-//   }
-// }
-
-// class ItemList extends Component {
-//   render() {
-//     return (
-//       <ol className='mainList'>
-//         {this.props.items.map((item, index) => {
-//           return <li className="listItem" key={index}>
-//             <h4 className="testName">{item.name}</h4>
-//             <a className="testUrl">{item.location} </a>
-//             <span className="testPrice">{item.price}</span>
-//           </li>
-//         })}
-//       </ol>
-//     )
-//   }
-// }
